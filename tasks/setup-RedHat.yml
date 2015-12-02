@@ -1,8 +1,13 @@
 ---
-- name: Ensure MySQL Python libraries are installed.
-  yum: "name=MySQL-python state=installed enablerepo={{ mysql_enablerepo }}"
+- name: Define mysql_enablerepo.
+  set_fact:
+    mysql_enablerepo: "{{ __mysql_enablerepo }}"
+  when: mysql_enablerepo is not defined
 
 - name: Ensure MySQL packages are installed.
-  yum: "name={{ item }} state=installed enablerepo={{ mysql_enablerepo }}"
+  yum:
+    name: "{{ item }}"
+    state: installed
+    enablerepo: "{{ mysql_enablerepo }}"
   with_items: mysql_packages
-  register: rh_mysql_install_packages
+  register: mysql_install

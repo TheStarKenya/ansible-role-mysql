@@ -1,8 +1,15 @@
 ---
-__mysql_daemon: mysqld
+__mysql_daemon: mariadb
+# Pass in a comma-separated list of repos to use (e.g. "remi,epel").
+__mysql_datadir: /var/lib/mysql
+__mysql_enablerepo: ""
+__mysql_log_error: /var/log/mariadb/mariadb.log
+__mysql_pid_file: /var/run/mariadb/mariadb.pid
+__mysql_slow_query_log_file: /var/log/mariadb/mariadb-slow.log
+__mysql_syslog_tag: mariadb
 __mysql_packages:
-  - mysql
-  - mysql-server
-__mysql_slow_query_log_file: /var/log/mysql-slow.log
+  - mariadb
+  - mariadb-server
+
 mysql_config_file: /etc/my.cnf
 mysql_socket: /var/lib/mysql/mysql.sock
