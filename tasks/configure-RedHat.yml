@@ -1,0 +1,9 @@
+---
+- name: Copy MySQL my.cnf.
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+  when: mysql_cnf_use_template and mysql_setup_server
+  notify: restart mysql
