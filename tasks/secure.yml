@@ -1,19 +1,19 @@
 ---
-- name: Get MySQL root user hosts.
+- name: get mysql root user hosts
   command: mysql -NBe "SELECT Host FROM mysql.user WHERE User = 'root' ORDER BY (Host='localhost') ASC"
   register: mysql_root_hosts
   changed_when: false
 
 # Note: We do not use mysql_user for this operation, as it doesn't always
 # update the root password correctly. See: https://goo.gl/MSOejW
-- name: Update MySQL root password for localhost.
+- name: update mysql root password for localhost
   shell: >
     mysql -u root -NBe "SET PASSWORD FOR '{{ mysql_root_username }}'@'{{ item }}' = PASSWORD('{{ mysql_root_password }}')"
   with_items: mysql_root_hosts.stdout_lines
   when: (mysql_install.changed) or mysql_root_password_update
 
-# Has to be after the root password assignment, for idempotency.
-- name: Copy MySQL ~/.my.cnf.
+# Has to be after the root password assignment, for idempotency
+- name: copy mysql ~/.my.cnf
   template:
     src: user-my.cnf.j2
     dest: ~/.my.cnf
@@ -21,14 +21,14 @@
     group: root
     mode: 0600
 
-- name: Get MySQL anonymous user hosts.
+- name: get mysql anonymous user hosts
   command: mysql -NBe "SELECT Host FROM mysql.user WHERE User = ''"
   register: mysql_anonymous_hosts
   changed_when: false
 
-- name: Remove MySQL anonymous users.
+- name: remove mysql anonymous users
   mysql_user: name="" host={{ item }} state=absent
   with_items: mysql_anonymous_hosts.stdout_lines
 
-- name: Remove MySQL test database.
+- name: remove mysql test database
   mysql_db: name=test state=absent

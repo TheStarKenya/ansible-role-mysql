@@ -1,37 +1,43 @@
 ---
-- name: Include OS-specific variables.
+- name: include os-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
 
-- name: Define mysql_service_name.
+- name: define mysql_service_name
   set_fact: mysql_service_name={{ __mysql_service_name }}
   when: mysql_service_name is not defined
 
-- name: Define mysql_packages.
+- name: define mysql_packages
   set_fact: mysql_packages="{{ __mysql_packages | list }}"
   when: mysql_packages is not defined
 
-- name: Define mysql_cnf_log_error.
+- name: define mysql_cnf_log_error
   set_fact: mysql_cnf_log_error={{ __mysql_cnf_log_error }}
   when: mysql_cnf_log_error is not defined
 
-- name: Define mysql_cnf_pid_file.
+- name: define mysql_cnf_pid_file
   set_fact: mysql_cnf_pid_file={{ __mysql_cnf_pid_file }}
   when: mysql_cnf_pid_file is not defined
 
 - include: setup-RedHat.yml
   when: ansible_os_family == "RedHat"
 
-- include: configure-RedHat.yml
-  when: ansible_os_family == "RedHat"
+- name: copy mysql my.cnf
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+  when: mysql_cnf_use_template and mysql_setup_server
+  notify: restart mysql
 
-- name: Start and enable MySQL.
+- name: start and enable mysql
   service: name={{ mysql_service_name }} state=started enabled=yes
   when: mysql_setup_server
 
 - include: secure.yml
   when: mysql_setup_server
 
-- name: Create MySQL databases.
+- name: create mysql databases
   mysql_db:
     name: "{{ item.name }}"
     collation: "{{ item.collation | default('utf8_general_ci') }}"
@@ -40,7 +46,7 @@
   with_items: mysql_create_databases
   when: mysql_setup_server
 
-- name: Create MySQL users.
+- name: create mysql users
   mysql_user:
     name: "{{ item.name }}"
     host: "{{ item.host | default('localhost') }}"

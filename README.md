@@ -15,7 +15,7 @@ Available variables are listed below, along with default values (see `defaults/m
 ```yaml
 mysql_setup_server: true
 
-# Set this to `yes` to forcibly update the root password.
+# Set this to `yes` to forcibly update the root password
 mysql_root_password_update: no
 mysql_root_username: root
 mysql_root_password: hackme
@@ -50,12 +50,9 @@ None
 Inside `vars/main.yml`:
 
 ```yaml
-mysql_root_password: super-secure-password
-
 mysql_cnf_mysqld_other:
   - max_allowed_packet = 64M
   - max_connections = 151
-
 mysql_create_databases:
   - name: example_db
     collation: latin1_general_ci
